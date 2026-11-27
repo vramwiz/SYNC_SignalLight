@@ -27,16 +27,18 @@ type
 
 // 種類と付属物から描画範囲を求める。すべての構成で原点は灯器本体の中心。
 function MakeLayout(const A: TSignalAppearance): TSignalLayout;
+// 十進の時刻から昼光と朝夕の寄与をそれぞれ0～1で返す。
 function SampleLight(Hour: Double): TSignalLightLevel;
 
 // 消灯した灯器を透明なキャンバスに描く。
 procedure DrawHousing(Canvas: TSignalCanvas; const A: TSignalAppearance;
   const Layout: TSignalLayout; const Light: TSignalLightLevel);
-// 指定の灯火を、消灯した灯器の対応領域へ描く。
+// 指定の灯火を、消灯した灯器の対応領域へ描く。Tintは点灯部分に掛ける$RRGGBB。
 procedure DrawLitLamp(Canvas: TSignalCanvas; const A: TSignalAppearance;
   const Layout: TSignalLayout; const Light: TSignalLightLevel;
   Lamp: TSignalLamp; Tint: Cardinal);
-// 人物マークを挟む2列の目盛りは、灯火とグローを描いた後に合成する。
+// 灯火とグローの上に目盛りを合成する。CenterYは表示するレンズの論理座標。
+// 同じ範囲を退避・復帰できるよう、目盛りの描画位置と部分キャッシュの範囲をそろえる。
 function WaitColumnArea(Canvas: TSignalCanvas; CenterY: Double;
   Column: TSignalWaitColumn): TRect;
 procedure DrawWaitColumn(Canvas: TSignalCanvas; CenterY: Double;
@@ -111,6 +113,7 @@ begin
         Result.Lamps[slGreen] := PointF(0, 42);
       end;
   end;
+  // 灯器の中心を維持したまま、支柱や周辺光が収まる対称な画像範囲を取る。
   Result.HalfWidth := Max(Result.BodyHW + 10,
     Abs(Result.Lamps[slRed].X) + LAMP_PATCH_RADIUS);
   Result.HalfHeight := Max(Result.BodyHH + 9,
@@ -280,6 +283,7 @@ begin
   Glass := MixColor(Glass, SignalColor($997553), Light.Twilight * 0.23);
   Base := MixColor(ScaleColor(Glass, 0.55), Hue, 0.055 + 0.072 * Light.Day);
   Brightness := 1.05 + 0.23 * (1 - Light.Day);
+  // 縮小時はLEDの間隔が1画素に近づくので、点の明暗差を抑えてちらつきを減らす。
   Detail := SmoothUnit((Canvas.Scale * LED_PITCH - 1.2) / 2.2);
   for Y := Area.Top to Area.Bottom - 1 do
   begin

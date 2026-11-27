@@ -1,0 +1,70 @@
+[
+  {
+    "id": "VRAMWIZ.SYNC_SignalLight",
+    "name": "交通信号",
+    "type": "フィルタプラグイン",
+    "summary": "車両用・歩行者用の信号機を描画し、点灯を切り替える",
+    "description": "https://raw.githubusercontent.com/vramwiz/SYNC_SignalLight/refs/heads/main/README.md",
+    "author": "VRAMの魔術師",
+    "repoURL": "https://github.com/vramwiz/SYNC_SignalLight/",
+    "licenses": [
+      {
+        "type": "GPL-3.0",
+        "isCustom": false,
+        "copyrights": [
+          {
+            "years": "2026",
+            "holder": "VRAMの魔術師"
+          }
+        ],
+        "licenseBody": null
+      }
+    ],
+    "tags": [
+      "エフェクト",
+      "カスタムオブジェクト"
+    ],
+    "dependencies": [],
+    "images": [],
+    "installer": {
+      "source": {
+        "github": {
+          "owner": "vramwiz",
+          "repo": "SYNC_SignalLight",
+          "pattern": "^SYNC_SignalLight\\.zip$"
+        }
+      },
+      "install": [
+        {
+          "action": "download"
+        },
+        {
+          "action": "extract"
+        },
+        {
+          "action": "copy",
+          "from": "{tmp}/SYNC_SignalLight",
+          "to": "{pluginsDir}/SYNC_SignalLight"
+        }
+      ],
+      "uninstall": [
+        {
+          "action": "delete",
+          "path": "{pluginsDir}/SYNC_SignalLight/"
+        }
+      ]
+    },
+    "version": [
+      {
+        "version": "v1.0.0",
+        "release_date": "2026-11-27",
+        "file": [
+          {
+            "path": "{pluginsDir}/SYNC_SignalLight/SYNC_SignalLight.auf2",
+            "XXH3_128": "79aec228f8f62858c6334d12c52f876d"
+          }
+        ]
+      }
+    ]
+  }
+]

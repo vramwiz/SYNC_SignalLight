@@ -46,7 +46,8 @@ begin
   inherited;
 end;
 
-// 透明な初期画像を生成する。ホストの標準パラメータはホストに任せる。
+// 透明な初期画像を生成し、転送に成功した場合に1を返す。
+// ホストの設定やVideoポインターを保持せず、転送が終わるまで描画器の画素を保護する。
 function SignalVideo(Video: PFILTER_PROC_VIDEO): Byte; cdecl;
 var
   Session: TSignalSession;
@@ -88,6 +89,7 @@ begin
   end;
 end;
 
+// func_createが返したセッションと、その描画キャッシュを解放する。
 procedure DestroySignal(EffectID: Int64; UserData: Pointer); cdecl;
 begin
   try

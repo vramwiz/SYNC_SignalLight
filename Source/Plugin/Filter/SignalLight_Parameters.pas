@@ -11,7 +11,8 @@ uses SignalLight_Settings;
 
 // 設定項目の実体はDLLが保持する。テーブル初期化後に一度呼ぶ。
 procedure RegisterSignalParameters;
-// ホストが現在値を書き込む項目から、描画とシーケンス用の値を取得する。
+// ホストが保持する項目から、検証済みの描画設定・時間設定と$RRGGBBの色補正を返す。
+// 項目の現在値は変更しない。
 procedure ReadSignalSettings(out Appearance: TSignalAppearance;
   out Timing: TSignalTiming; out LampTint: Cardinal);
 
@@ -20,6 +21,7 @@ implementation
 uses AviUtl2FilterTypes, PluginFilterTable;
 
 const
+  // 既存の選択肢との対応を保つため、表示名を変えるときも並びと値を維持する。
   KINDS: array[0..4] of TFILTER_ITEM_SELECT_ITEM = (
     (Name: '車両用横型'; Value: Ord(skHorizontal)),
     (Name: '車両用縦型'; Value: Ord(skVertical)),

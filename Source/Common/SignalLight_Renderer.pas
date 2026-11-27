@@ -16,6 +16,7 @@ type
     FAppearance: TSignalAppearance;
     FLayout: TSignalLayout;
     FLight: TSignalLightLevel;
+    // 灯火の下には筐体、目盛りの下には現在の灯火を含む画像を退避する。
     FLampPatch: TSignalPatch;
     FWaitPatches: array[TSignalWaitColumn] of TSignalPatch;
     FLastLamp: TSignalLamp;
@@ -28,7 +29,7 @@ type
     constructor Create;
     destructor Destroy; override;
     // 現在の設定を反映し、描画器所有のRGBAとサイズを返す。
-    // 画素へのポインターは次のRenderまたは破棄まで借用できる。
+    // 画素ポインターは次のRenderまたは破棄まで有効。借用中の並行呼び出しは呼出側で防ぐ。
     procedure Render(const A: TSignalAppearance; const Frame: TSignalFrame;
       Tint: Cardinal; out Pixels: PPIXEL_RGBA; out Width, Height: Integer);
   end;
@@ -81,6 +82,7 @@ begin
 
   if UpdateLamp or UpdateWait then
   begin
+    // 描画途中で例外が起きた場合は、次の呼び出しで筐体から再描画する。
     FValid := False;
     if RebuildHousing then
       Rebuild(A)

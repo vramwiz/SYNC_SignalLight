@@ -29,6 +29,7 @@ type
     Zoom, Hour, PoleLength: Double; // %, 24時間表記, 100%時の画素
     BodyColor, PoleColor, HoodColor: Cardinal; // $RRGGBB
     ShowHood: Boolean;
+    // 筐体とレンズのキャッシュを再利用できる設定かどうかを比較する。
     function SameAs(const Other: TSignalAppearance): Boolean;
   end;
 
@@ -51,7 +52,7 @@ function BoundedValue(Value, LowValue, HighValue, DefaultValue: Double): Double;
 // 歩行者用の2種類は同じシーケンスと人物マークを使う。
 function IsPedestrian(Kind: TSignalKind): Boolean;
 
-// オブジェクトの経過秒から現在の灯火を計算する。待ち時間付きでは残り目盛りも返す。
+// 配置開始からの経過秒と設定だけで灯火を返す。歩行者信号2では目盛りの段数と位置も返す。
 function EvaluateSignal(Kind: TSignalKind; const Timing: TSignalTiming;
   Elapsed: Double): TSignalFrame;
 
@@ -137,6 +138,7 @@ begin
 
   if IsNaN(Elapsed) or IsInfinite(Elapsed) then
     Elapsed := 0;
+  // 繰り返しでは負のオフセットも周期内へ折り返す。一周で止める場合は開始前を0秒として扱う。
   Position := Elapsed + Timing.Offset;
   if Timing.RepeatCycle then
     Position := CyclePosition(Position, Cycle)

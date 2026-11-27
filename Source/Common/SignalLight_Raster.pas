@@ -27,7 +27,9 @@ type
   public
     // 幅と高さは100%時の半寸法。描画座標の原点を中心画素間へそろえる。
     procedure Reset(HalfWidth, HalfHeight, Scale: Double);
+    // 論理座標の境界を右端・下端を含まない画素範囲へ変換する。平滑化用に外側を1画素確保する。
     function PixelBounds(L, T, R, B: Double): TRect;
+    // 画素中心を論理座標へ戻す。0は画像の中心。
     function XAt(X: Integer): Double; inline;
     function YAt(Y: Integer): Double; inline;
     // 画素座標はPixelBoundsでクリップ済みのものを指定する。
@@ -37,6 +39,7 @@ type
       const First, Last: TSignalColor; Horizontal: Boolean = False);
     procedure Ellipse(CX, CY, RX, RY: Double;
       const Top, Bottom: TSignalColor; Opacity: Double = 1);
+    // 指定した楕円の内側だけにグローを合成する。半径は論理座標、合成量は0～1。
     procedure Halo(CX, CY, RX, RY: Double; const Color: TSignalColor; Opacity: Double);
     // 変化する領域のみ退避・復帰する。配列を持つPatchは呼出側が所有する。
     procedure SavePatch(var Patch: TSignalPatch; const Area: TRect);
@@ -48,12 +51,14 @@ type
     property Scale: Double read FScale;
   end;
 
+// 色と合成量は0～1を基準とする。輝度補正で範囲を超えた色は画素への書き込みで丸める。
 function UnitValue(Value: Double): Double; inline;
 function SmoothUnit(Value: Double): Double; inline;
 function SignalColor(Code: Cardinal): TSignalColor;
 function MixColor(const A, B: TSignalColor; Amount: Double): TSignalColor; inline;
 function ScaleColor(const Color: TSignalColor; Amount: Double): TSignalColor; inline;
 function TintColor(const A, B: TSignalColor): TSignalColor; inline;
+// 原点中心の角丸矩形への符号付き距離を論理座標で返す。負の値は内側。
 function BoxDistance(X, Y, HW, HH, Radius: Double): Double; inline;
 
 implementation
@@ -159,6 +164,7 @@ begin
     P^.A := Round(UnitValue(Alpha) * 255);
     Exit;
   end;
+  // 転送用の画素はストレートアルファなので、合成後のアルファで色を正規化する。
   A := Alpha + P^.A / 255 * (1 - Alpha);
   Weight := Alpha / A;
   P^.R := Round(P^.R + (R - P^.R) * Weight);
