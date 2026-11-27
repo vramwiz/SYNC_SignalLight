@@ -28,6 +28,7 @@
     "images": [],
     "installer": {
       "source": {
+        "direct": null,
         "github": {
           "owner": "vramwiz",
           "repo": "SYNC_SignalLight",
